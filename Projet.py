@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.decomposition import PCA
 
 trnImgs = np.load("data/trn_img.npy")
 trnLbls = np.load("data/trn_lbl.npy")
@@ -39,3 +40,23 @@ def Question1():
     results = computeClassAll(devImgs, repr)
     rate = failureRate(results, devLbls)
     print("Le taux d'exemples mal classes est de : ", rate)
+    
+
+
+def Question2():
+    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]
+    for i in val_rep:
+        pca = PCA(i)
+        trnImgsPCA = pca.fit_transform(trnImgs)
+        devImgsPCA = pca.transform(devImgs)
+        repr = calculRepr(trnImgsPCA, trnLbls)
+        results = computeClassAll(devImgsPCA, repr)
+        rate = failureRate(results, devLbls)
+        print("Le taux d'exemples mal classes pour PCA({0}) est de : {1}".format(i, rate))
+        
+""" Au plus on reduit la dimension avec la PCA, au plus la classification est 
+rapide, mais lorsqu'on la reduit trop, la precision de la classification en est
+reduite. On garde un taux d'erreur convenable (relativement a celui sans PCA)
+en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la 
+classification est en revanche beaucoup plus rapide. """
+
