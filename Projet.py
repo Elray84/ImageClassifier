@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+import time
 
 trnImgs = np.load("data/trn_img.npy")
 trnLbls = np.load("data/trn_lbl.npy")
@@ -23,7 +24,7 @@ def show(imgs):
         plt.imshow(img.reshape(28,28), plt.cm.gray)
 
 
-def computeClassAll(imgs, repr):
+def classifyAll(imgs, repr):
     dToRepr = []
     for i in range(10):
         dToRepr.append(np.linalg.norm(imgs-repr[i], axis=1))
@@ -38,22 +39,24 @@ def failureRate(results, labels):
 
 def Question1():
     repr = calculRepr(trnImgs, trnLbls)
-    results = computeClassAll(devImgs, repr)
+    results = classifyAll(devImgs, repr)
     rate = failureRate(results, devLbls)
-    print("Le taux d'exemples mal classes est de : ", rate)
+    print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
 
-
+def classifyWithPCA(PCADimension):
+    pca = PCA(PCADimension)
+    trnImgsPCA = pca.fit_transform(trnImgs)
+    devImgsPCA = pca.transform(devImgs)
+    repr = calculRepr(trnImgsPCA, trnLbls)
+    results = classifyAll(devImgsPCA, repr)
+    rate = failureRate(results, devLbls)
+    return rate
 
 def Question2():
-    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]
+    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]  
     for i in val_rep:
-        pca = PCA(i)
-        trnImgsPCA = pca.fit_transform(trnImgs)
-        devImgsPCA = pca.transform(devImgs)
-        repr = calculRepr(trnImgsPCA, trnLbls)
-        results = computeClassAll(devImgsPCA, repr)
-        rate = failureRate(results, devLbls)
-        print("Le taux d'exemples mal classes pour PCA({0}) est de : {1}".format(i, rate))
+        rate = classifyWithPCA(i)
+        print("Le taux d'exemples mal classes pour PCA({0}) est de : {1}%".format(i, rate*100))
 
 """ Au plus on reduit la dimension avec la PCA, au plus la classification est
 rapide, mais lorsqu'on la reduit trop, la precision de la classification en est
@@ -61,11 +64,17 @@ reduite. On garde un taux d'erreur convenable (relativement a celui sans PCA)
 en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la
 classification est en revanche beaucoup plus rapide. """
 
+def chronoMethode(callback):
+    t0 = time.time()
+    callback()
+    t1 = time.time() - t0
+    print("Temps d'execution de {} : {} sec".format(callback.__name__, t1))
+
+
 def Question3():
-    SVClassifier = SVC(kernel = "linear")
+    SVClassifier = SVC(kernel = "poly", degree = 2)
     SVClassifier.fit(trnImgs, trnLbls)
     predictedLbls = SVClassifier.predict(devImgs)
     rate = failureRate(predictedLbls, devLbls)
-    print("Le taux d'exemples mal classes est de :", rate)
+    print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
 
-Question3()
