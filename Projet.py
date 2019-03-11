@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.svm import SVC
 
 trnImgs = np.load("data/trn_img.npy")
 trnLbls = np.load("data/trn_lbl.npy")
@@ -21,7 +22,7 @@ def show(imgs):
         plt.figure()
         plt.imshow(img.reshape(28,28), plt.cm.gray)
 
-    
+
 def computeClassAll(imgs, repr):
     dToRepr = []
     for i in range(10):
@@ -30,17 +31,17 @@ def computeClassAll(imgs, repr):
     dToRepr = np.transpose(dToRepr)
     results = np.argmin(dToRepr, axis=1)
     return results
-    
+
 def failureRate(results, labels):
     return (results != labels).sum() / labels.shape[0]
-    
-    
+
+
 def Question1():
     repr = calculRepr(trnImgs, trnLbls)
     results = computeClassAll(devImgs, repr)
     rate = failureRate(results, devLbls)
     print("Le taux d'exemples mal classes est de : ", rate)
-    
+
 
 
 def Question2():
@@ -53,10 +54,18 @@ def Question2():
         results = computeClassAll(devImgsPCA, repr)
         rate = failureRate(results, devLbls)
         print("Le taux d'exemples mal classes pour PCA({0}) est de : {1}".format(i, rate))
-        
-""" Au plus on reduit la dimension avec la PCA, au plus la classification est 
+
+""" Au plus on reduit la dimension avec la PCA, au plus la classification est
 rapide, mais lorsqu'on la reduit trop, la precision de la classification en est
 reduite. On garde un taux d'erreur convenable (relativement a celui sans PCA)
-en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la 
+en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la
 classification est en revanche beaucoup plus rapide. """
 
+def Question3():
+    SVClassifier = SVC(kernel = "linear")
+    SVClassifier.fit(trnImgs, trnLbls)
+    predictedLbls = SVClassifier.predict(devImgs)
+    rate = failureRate(predictedLbls, devLbls)
+    print("Le taux d'exemples mal classes est de :", rate)
+
+Question3()
