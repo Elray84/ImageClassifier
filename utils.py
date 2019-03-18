@@ -1,3 +1,5 @@
+## Utils
+
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
@@ -37,11 +39,6 @@ def failureRate(results, labels):
     return (results != labels).sum() / labels.shape[0]
 
 
-def Question1():
-    repr = calculRepr(trnImgs, trnLbls)
-    results = classifyAll(devImgs, repr)
-    rate = failureRate(results, devLbls)
-    print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
 
 def classifyWithPCA(PCADimension):
     pca = PCA(PCADimension)
@@ -49,14 +46,8 @@ def classifyWithPCA(PCADimension):
     devImgsPCA = pca.transform(devImgs)
     repr = calculRepr(trnImgsPCA, trnLbls)
     results = classifyAll(devImgsPCA, repr)
-    rate = failureRate(results, devLbls)
-    return rate
+    return results
 
-def Question2():
-    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]  
-    for i in val_rep:
-        rate = classifyWithPCA(i)
-        print("Le taux d'exemples mal classes pour PCA({0}) est de : {1}%".format(i, rate*100))
 
 """ Au plus on reduit la dimension avec la PCA, au plus la classification est
 rapide, mais lorsqu'on la reduit trop, la precision de la classification en est
@@ -65,16 +56,17 @@ en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la
 classification est en revanche beaucoup plus rapide. """
 
 def chronoMethode(callback):
-    t0 = time.time()
-    callback()
-    t1 = time.time() - t0
-    print("Temps d'execution de {} : {} sec".format(callback.__name__, t1))
-
-
-def Question3():
-    SVClassifier = SVC(kernel = "poly", degree = 2)
+    init_clock = time.time()
+    results = callback()
+    length = time.time() - init_clock
+    return results, length
+    
+def SVClassifierRate(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto", 
+                 shrinking = True, tol = 0.001, max_iter = -1, decision_function_shape = "ovr"):
+                     
+    SVClassifier = SVC(C = Penalty, kernel = kernel, degree = degree, gamma = gamma, shrinking = shrinking,
+                       tol = tol, max_iter = max_iter, decision_function_shape = decision_function_shape)
     SVClassifier.fit(trnImgs, trnLbls)
     predictedLbls = SVClassifier.predict(devImgs)
     rate = failureRate(predictedLbls, devLbls)
     print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
-
