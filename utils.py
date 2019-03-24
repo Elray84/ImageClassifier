@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 ## Utils
 
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix
-import time
+from time import time as clock
+
 
 trnImgs = np.load("data/trn_img.npy")
 trnLbls = np.load("data/trn_lbl.npy")
@@ -12,7 +13,6 @@ trnLbls = np.load("data/trn_lbl.npy")
 devImgs = np.load("data/dev_img.npy")
 devLbls = np.load("data/dev_lbl.npy")
 
-import matplotlib.pyplot as plt
 
 def calculRepr(imgs, labels):
     repr = []
@@ -36,9 +36,9 @@ def classifyAll(imgs, repr):
     results = np.argmin(dToRepr, axis=1)
     return results
 
+
 def failureRate(results, labels):
     return (results != labels).sum() / labels.shape[0]
-
 
 
 def classifyWithPCA(PCADimension):
@@ -56,23 +56,20 @@ reduite. On garde un taux d'erreur convenable (relativement a celui sans PCA)
 en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la
 classification est en revanche beaucoup plus rapide. """
 
-def chronoMethode(callback):
-    init_clock = time.time()
+
+
+def chrono(callback):
+    init_clock = clock()
     results = callback()
-    length = time.time() - init_clock
+    length = clock() - init_clock
     return results, length
 
-def SVClassifierRate(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto",
+
+def SVClassifier(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto",
                  shrinking = True, tol = 0.001, max_iter = -1, decision_function_shape = "ovr"):
 
     SVClassifier = SVC(C = Penalty, kernel = kernel, degree = degree, gamma = gamma, shrinking = shrinking,
                        tol = tol, max_iter = max_iter, decision_function_shape = decision_function_shape)
-    SVClassifier.fit(trnImgs, trnLbls)
-    predictedLbls = SVClassifier.predict(devImgs)
-    rate = failureRate(predictedLbls, devLbls)
-    print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
-    return predictedLbls
-
-def confusionMatrix(callback):
-    conf = confusion_matrix(devLbls, callback())
-    return conf
+    _, learningTime = chrono(lambda: SVClassifier.fit(trnImgs, trnLbls))
+    predictedLbls, predictionTime = chrono(lambda: SVClassifier.predict(devImgs))
+    return predictedLbls, predictionTime, learningTime
