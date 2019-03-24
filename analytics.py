@@ -14,11 +14,12 @@ def Question1():
     results, length = ut.chronoMethode(lambda : ut.classifyAll(ut.devImgs, repr))
     rate = ut.failureRate(results, ut.devLbls)
     print("Le taux d'exemples mal classes est de : {:.3f}%, en {:.3f}s".format(rate*100, length))
-    
+
 def Question2():
-    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]  
+    val_rep = [4, 10, 25, 50, 100, 200, 300, 400, 500, 600, 700, 784]
     for i in val_rep:
         results, length = ut.chronoMethode(lambda : ut.classifyWithPCA(i))
         rate = ut.failureRate(results, ut.devLbls)
         print("Le taux d'exemples mal classes pour PCA({}) est de : {:.3f}% en {:.3f}s".format(i, rate*100, length))
-        
+
+print(ut.confusionMatrix(lambda : ut.SVClassifierRate(tol=1.1, kernel="poly", degree = 2)))

@@ -3,6 +3,7 @@
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix
 import time
 
 trnImgs = np.load("data/trn_img.npy")
@@ -60,13 +61,18 @@ def chronoMethode(callback):
     results = callback()
     length = time.time() - init_clock
     return results, length
-    
-def SVClassifierRate(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto", 
+
+def SVClassifierRate(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto",
                  shrinking = True, tol = 0.001, max_iter = -1, decision_function_shape = "ovr"):
-                     
+
     SVClassifier = SVC(C = Penalty, kernel = kernel, degree = degree, gamma = gamma, shrinking = shrinking,
                        tol = tol, max_iter = max_iter, decision_function_shape = decision_function_shape)
     SVClassifier.fit(trnImgs, trnLbls)
     predictedLbls = SVClassifier.predict(devImgs)
     rate = failureRate(predictedLbls, devLbls)
     print("Le taux d'exemples mal classes est de : {0}%".format(rate*100))
+    return predictedLbls
+
+def confusionMatrix(callback):
+    conf = confusion_matrix(devLbls, callback())
+    return conf
