@@ -2,7 +2,6 @@
 ## Results
 
 import utils as ut
-import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 def Question1():
@@ -19,9 +18,10 @@ def Question2():
         print("Le taux d'exemples mal classes pour PCA({}) est de : {:.3f}% en {:.3f}s".format(i, rate*100, length))
 
 
-predictedLbls, predictionTime, learningTime = ut.SVClassifier(tol=1.1, kernel="poly", degree = 2)
-ut.np.save("temp.npy", predictedLbls)
-# predictedLbls = ut.np.load("temp.npy");
-rate = ut.failureRate(predictedLbls, ut.devLbls)
-print("Le taux d'échec est {:.3}%".format(rate*100));
-print(confusion_matrix(predictedLbls, ut.devLbls))
+if __name__ == '__main__':
+    predictedLbls, predictionTime, learningTime = ut.SVClassifier(tol=1.1, kernel="poly", degree = 2)
+    ut.np.save("temp.npy", predictedLbls)
+    # predictedLbls = ut.np.load("temp.npy");
+    rate = ut.failureRate(predictedLbls, ut.devLbls)
+    print("Le taux d'échec est {:.3}%".format(rate*100));
+    print(confusion_matrix(predictedLbls, ut.devLbls))

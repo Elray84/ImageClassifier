@@ -4,6 +4,7 @@
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from time import time as clock
 
 
@@ -72,4 +73,12 @@ def SVClassifier(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto",
                        tol = tol, max_iter = max_iter, decision_function_shape = decision_function_shape)
     _, learningTime = chrono(lambda: SVClassifier.fit(trnImgs, trnLbls))
     predictedLbls, predictionTime = chrono(lambda: SVClassifier.predict(devImgs))
+    return predictedLbls, predictionTime, learningTime
+
+
+def neighborsClassifier(n_neighbors = 5, weights = 'uniform', leaf_size = 30, power = 2, nb_jobs = None):
+    neighborsClassifier = KNeighborsClassifier(n_neighbors = n_neighbors, weights = weights,
+                                               leaf_size = leaf_size, p = power, n_jobs = nb_jobs)
+    _, learningTime = chrono(lambda: neighborsClassifier.fit(trnImgs, trnLbls))
+    predictedLbls, predictionTime = chrono(lambda: neighborsClassifier.predict(devImgs))
     return predictedLbls, predictionTime, learningTime
