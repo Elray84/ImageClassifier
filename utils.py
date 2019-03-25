@@ -15,6 +15,8 @@ devImgs = np.load("data/dev_img.npy")
 devLbls = np.load("data/dev_lbl.npy")
 
 
+""" Pour un ensemble d'images d'apprentissage (imgs) et les labels correspondants
+ (labels), renvoie les représentants de chaque classe. """
 def calculRepr(imgs, labels):
     repr = []
     for i in np.unique(labels):
@@ -22,12 +24,15 @@ def calculRepr(imgs, labels):
     return np.array(repr)
 
 
+""" Permet d'affiche un ensemble d'images (imgs). """
 def show(imgs):
     for img in imgs:
         plt.figure()
         plt.imshow(img.reshape(28,28), plt.cm.gray)
 
 
+""" Classe un ensemble d'images (imgs) par un algorithme a distance minimum en 
+utilisant les representants (repr). """
 def classifyAll(imgs, repr):
     dToRepr = []
     for i in range(10):
@@ -51,14 +56,8 @@ def classifyWithPCA(PCADimension):
     return results
 
 
-""" Au plus on reduit la dimension avec la PCA, au plus la classification est
-rapide, mais lorsqu'on la reduit trop, la precision de la classification en est
-reduite. On garde un taux d'erreur convenable (relativement a celui sans PCA)
-en reduisant jusqu'a 50 voire 25 dimensions, valeurs pour lesquelles la
-classification est en revanche beaucoup plus rapide. """
-
-
-
+""" Renvoie le resultat de l'appel de la fonction callback, ainsi que son temps
+d'execution. """
 def chrono(callback):
     init_clock = clock()
     results = callback()
@@ -66,6 +65,9 @@ def chrono(callback):
     return results, length
 
 
+""" Prend les memes parametres que SVC et classe les images de devImgs. Renvoie
+les labels predits, le temps de prediction, ainsi que le temps d'apprentissage 
+du classifieur. """
 def SVClassifier(Penalty = 1.0, kernel = "rbf", degree = 3, gamma = "auto",
                  shrinking = True, tol = 0.001, max_iter = -1, decision_function_shape = "ovr"):
 
