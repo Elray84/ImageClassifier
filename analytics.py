@@ -19,9 +19,15 @@ def Question2():
 
 
 if __name__ == '__main__':
+    print("Q1")
+    Question1()
+
+    print("Q2")
+    Question2()
+
+    print("Q3")
     predictedLbls, predictionTime, learningTime = ut.SVClassifier(tol=1.1, kernel="poly", degree = 2)
-    ut.np.save("temp.npy", predictedLbls)
-    # predictedLbls = ut.np.load("temp.npy");
     rate = ut.failureRate(predictedLbls, ut.devLbls)
-    print("Le taux d'échec est {:.3}%".format(rate*100));
+    print("Le taux d'échec est {:.3}% en {:.3}s d'apprentissage, et {:.3}s de prédiction.".format(rate*100, learningTime, predictionTime));
     print(confusion_matrix(predictedLbls, ut.devLbls))
+    # ut.np.save("test.npy", predictedLbls)
